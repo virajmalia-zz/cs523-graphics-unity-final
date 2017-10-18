@@ -15,14 +15,12 @@ public class AnimatorScript : MonoBehaviour
     void Start()
     {
         anim = GetComponent<Animator>();
-        jump = false;
         collider = GetComponent<CapsuleCollider>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        jump = false;
         disableCollider = false;
         if (anim == null) return;
 
@@ -56,58 +54,5 @@ public class AnimatorScript : MonoBehaviour
         this.transform.Translate(maxspeed * x * Time.deltaTime,0f,0f,Space.Self);
     }
 
-
-    private void FixedUpdate()
-    {
-        if (jump)
-        {
-            collider.radius = 0;
-            collider.height = 0;
-            anim.SetBool("JumpObstacle", true);
-            GetComponent<Rigidbody>().useGravity = false;
-            GetComponent<Rigidbody>().isKinematic = false;
-        }
-        else if(disableCollider)
-        {
-            collider.radius = 0;
-            collider.height = 0;
-            anim.SetBool("JumpObstacle", false);
-            GetComponent<Rigidbody>().useGravity = false;
-            GetComponent<Rigidbody>().isKinematic = false;
-        }
-        else
-        {
-            collider.radius = 0.5f;
-            collider.height = 2f;
-            anim.SetBool("JumpObstacle", false);
-            GetComponent<Rigidbody>().useGravity = true;
-            GetComponent<Rigidbody>().isKinematic = true;
-        }
-
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Obstacle"))
-        {
-            jump = true;
-        }
-        else
-        {
-            jump = false;
-        }
-    }
-
-    void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.CompareTag("Obstacle"))
-        {
-            disableCollider = true;
-        }
-        else
-        {
-            disableCollider = false;
-        }
-    }
 
 }
