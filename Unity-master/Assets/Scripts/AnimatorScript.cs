@@ -8,16 +8,22 @@ public class AnimatorScript : MonoBehaviour
     static int JumpObstacle = Animator.StringToHash("Base Layer.JumpObstacle");
     private Animator anim;
     private float maxspeed = 5f;
+    private bool jump;
+    private CapsuleCollider collider;
+    private bool disableCollider;
     // Use this for initialization
     void Start()
     {
         anim = GetComponent<Animator>();
+        jump = false;
+        collider = GetComponent<CapsuleCollider>();
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        jump = false;
+        disableCollider = false;
         if (anim == null) return;
 
         var x = Input.GetAxis("Horizontal");
@@ -50,12 +56,58 @@ public class AnimatorScript : MonoBehaviour
         this.transform.Translate(maxspeed * x * Time.deltaTime,0f,0f,Space.Self);
     }
 
-    void OnCollisionEnter(Collision other)
+
+    private void FixedUpdate()
+    {
+        if (jump)
+        {
+            collider.radius = 0;
+            collider.height = 0;
+            anim.SetBool("JumpObstacle", true);
+            GetComponent<Rigidbody>().useGravity = false;
+            GetComponent<Rigidbody>().isKinematic = false;
+        }
+        else if(disableCollider)
+        {
+            collider.radius = 0;
+            collider.height = 0;
+            anim.SetBool("JumpObstacle", false);
+            GetComponent<Rigidbody>().useGravity = false;
+            GetComponent<Rigidbody>().isKinematic = false;
+        }
+        else
+        {
+            collider.radius = 0.5f;
+            collider.height = 2f;
+            anim.SetBool("JumpObstacle", false);
+            GetComponent<Rigidbody>().useGravity = true;
+            GetComponent<Rigidbody>().isKinematic = true;
+        }
+
+    }
+
+    void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Obstacle"))
         {
-            print("Hi");
-            anim.SetBool("JumpObstacle", true);
+            jump = true;
+        }
+        else
+        {
+            jump = false;
         }
     }
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("Obstacle"))
+        {
+            disableCollider = true;
+        }
+        else
+        {
+            disableCollider = false;
+        }
+    }
+
 }
